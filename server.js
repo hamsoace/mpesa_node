@@ -2,14 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const admin = require('firebase-admin');
-const serviceKey = require('./service.json');
-
-// const base64 = process.env.FIREBASE_SERVICE_ACCOUNT;
-// const serviceAccount = JSON.parse(Buffer.from(base64, 'base64').toString('ascii'));
+const base64 = process.env.FIREBASE_SERVICE_ACCOUNT;
+const serviceAccount = JSON.parse(Buffer.from(base64, 'base64').toString('ascii'));
 
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceKey),
+    credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://fanzone-26f22-default-rtdb.firebaseio.com"
 });
 
@@ -73,21 +71,7 @@ app.post('/mpesa/result', (req, res) => {
     res.status(200).json({ message: "Result received successfully" });
 });
 
-// async function getMpesaAccessToken() {
-//     try {
-//         const response = await axios.get("https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-//             auth: {
-//                 username: "3R0GNCMQnlP3C8ZSQZMTNXroJNrPvk1gd5bExKhCMFSHRnEH",
-//                 password: "ZANR4Z35Cna2Pg6uig35HY72ZhI8caAhFtkqifPb34J7pnqxutHRzXdg9fL8A9R7"
-//             }
-//         });
 
-//         return response.data.access_token;
-//     } catch (error) {
-//         console.error("Error getting MPESA access token: ", error);
-//         throw error;
-//     }
-// }
 
 async function getCurrentFirebaseBalance(userId) {
     const userRef = db.ref(`Users/${userId}`);
