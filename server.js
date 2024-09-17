@@ -2,12 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const admin = require('firebase-admin');
-const base64 = process.env.FIREBASE_SERVICE_ACCOUNT;
-const serviceAccount = JSON.parse(Buffer.from(base64, 'base64').toString('ascii'));
+const serviceKey = require('./service.json');
+
+// const base64 = process.env.FIREBASE_SERVICE_ACCOUNT;
+// const serviceAccount = JSON.parse(Buffer.from(base64, 'base64').toString('ascii'));
 
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceKey),
     databaseURL: "https://fanzone-26f22-default-rtdb.firebaseio.com"
 });
 
