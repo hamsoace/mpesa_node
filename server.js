@@ -73,78 +73,21 @@ app.post('/mpesa/result', (req, res) => {
     res.status(200).json({ message: "Result received successfully" });
 });
 
+// async function getMpesaAccessToken() {
+//     try {
+//         const response = await axios.get("https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+//             auth: {
+//                 username: "3R0GNCMQnlP3C8ZSQZMTNXroJNrPvk1gd5bExKhCMFSHRnEH",
+//                 password: "ZANR4Z35Cna2Pg6uig35HY72ZhI8caAhFtkqifPb34J7pnqxutHRzXdg9fL8A9R7"
+//             }
+//         });
 
-app.post('/withdraw', async (req, res) => {
-    const { amount, phoneNumber, userId } = req.body;
-
-    if (!amount || !phoneNumber || !userId) {
-        return res.status(400).json({ message: "Amount, phone number, and user ID are required"});
-    }
-
-    const mpesaB2CPaymentRequest = {
-        InitiatorName: "CAPIYO3",
-        InitiatorPassword: "Sumeshu1!",
-        SecurityCredential: "A2PmFbdHOsOOWDj1nynFB9C5/E8M3jLGBopunViq5o6JBGLOqamIMufk4zwM5U0lrnvPbuSQpyfJoEiOGhzBD2aqJPA442UrQ4hEZQwDDadPqEK8cN1WfN5IPfXmOuHsDnuxmCJ5V2bLPA+5ixIA1vQdIz/6DlnkEZEJQae8Jsnde7sgku9KosOuILcJqXE1JEfqMMIoCPtAf3qxp13LtWRxIj38L03vKRc61oBpRS5QZyd5eNQO0AESNJ9CNXQS+6tSVNOUzdwID6u0/ZfBwRF3I8w6/SUCudz7oFr9KJRCNJ3wsBr9Q1g317UlPSUAIdxh05EfrD0tNHCDwH9Wqg==",
-        CommandID: "BusinessPayment",
-        Amount: amount,
-        PartyA: "4130051",
-        PartyB: phoneNumber,
-        Remarks: "Withdrawal of funds from account",
-        QueueTimeOutURL: "http://localhost:3000/mpesa/queue-timeout",
-        ResultURL: "http://localhost:3000/mpesa/result",
-        Occasion: "Withdrawal"
-    };
-
-    try {
-        const mpesaResponse = await axios.post("https://api.safaricom.co.ke/mpesa/b2c/v1/paymentrequest", mpesaB2CPaymentRequest, {
-            headers: {
-                Authorization: `Bearer ${await getMpesaAccessToken()}`
-            }
-        });
-
-        if (mpesaResponse.data && mpesaResponse.data.ResponseCode === "0") {
-            console.log("MPESA B2C Payment successful:", mpesaResponse.data);
-
-            const currentBalance = await getCurrentFirebaseBalance(userId);
-            const newBalance = currentBalance - amount;
-
-            await updateFirebaseBalance(userId, newBalance);
-
-            return res.status(200).json({
-                message: "Withdrawal successful",
-                newBalance: newBalance
-            });
-        } else {
-            return res.status(400).json({
-                message: "Failed to process MPESA B2C payment",
-                mpesaResponse: mpesaResponse.data
-            });
-        }
-
-    } catch (error) {
-        console.error("Error processing MPESA B2C request:", error);
-        return res.status(500).json({
-            message: "Server error occurred",
-            error: error.message
-        });
-    }
-});
-
-async function getMpesaAccessToken() {
-    try {
-        const response = await axios.get("https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-            auth: {
-                username: "3R0GNCMQnlP3C8ZSQZMTNXroJNrPvk1gd5bExKhCMFSHRnEH",
-                password: "ZANR4Z35Cna2Pg6uig35HY72ZhI8caAhFtkqifPb34J7pnqxutHRzXdg9fL8A9R7"
-            }
-        });
-
-        return response.data.access_token;
-    } catch (error) {
-        console.error("Error getting MPESA access token: ", error);
-        throw error;
-    }
-}
+//         return response.data.access_token;
+//     } catch (error) {
+//         console.error("Error getting MPESA access token: ", error);
+//         throw error;
+//     }
+// }
 
 async function getCurrentFirebaseBalance(userId) {
     const userRef = db.ref(`Users/${userId}`);
